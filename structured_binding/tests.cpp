@@ -241,19 +241,29 @@ struct std::tuple_element<1, Something> {
 
 // step 3 - get<Index>
 template <size_t Index>
-decltype(auto) get(const Something& sth);
-
-template <>
-decltype(auto) get<0>(const Something& sth)
+decltype(auto) get(const Something& sth)
 {
-    return static_cast<int>(sth);
+    if constexpr(Index == 0)
+    {
+        return static_cast<int>(sth);
+    }
+    else 
+    {
+        return something_desc.at(sth);
+    }
 }
 
-template <>
-decltype(auto) get<1>(const Something& sth)
-{
-    return something_desc.at(sth);
-}
+// template <>
+// decltype(auto) get<0>(const Something& sth)
+// {
+//     return static_cast<int>(sth);
+// }
+
+// template <>
+// decltype(auto) get<1>(const Something& sth)
+// {
+//     return something_desc.at(sth);
+// }
 
 TEST_CASE("Structured binding for Something")
 {
