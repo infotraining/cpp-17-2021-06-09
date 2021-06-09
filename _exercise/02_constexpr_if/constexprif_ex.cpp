@@ -9,6 +9,19 @@ using namespace std;
 template <typename Iterator>
 void advance_it(Iterator& it, size_t n)
 {
+    using it_category = typename std::iterator_traits<Iterator>::iterator_category;
+
+    if constexpr (std::is_base_of_v<std::random_access_iterator_tag, it_category>)
+    {
+        it += n;
+    }
+    else
+    {
+        while (n--)
+        {
+            ++it;
+        }
+    }
 }
 
 TEST_CASE("constexpr-if with iterator categories")
