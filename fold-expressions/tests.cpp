@@ -46,9 +46,44 @@ namespace BeforeCpp17
     }
 }
 
+template <typename... TArgs>
+auto sum(const TArgs&... args)  // (1, 2, 3, 4)
+{
+    return (... + args); // left fold - ((((1 + 2) + 3) + 4) +5 )
+}
+
+template <typename... TArgs>
+auto sum_r(const TArgs&... args)  // (1, 2, 3, 4)
+{
+    return (args + ...); // right fold - (1 + (2 + (3 + (4 + 5 ))))
+}
+
+template <typename... TArgs>
+void print(const TArgs&... args)
+{
+    bool is_first = true;
+
+    auto with_space = [&is_first](const auto& arg) {
+        if (!is_first)
+            std::cout << " ";
+            is_first = false;
+        return arg;
+    };
+
+    (std::cout << ... << with_space(args)) << "\n";
+}
+
+template <typename... TArgs>
+void print_lines(const TArgs&... args)
+{
+    (..., (std::cout << args << "\n"));    
+}
+
 TEST_CASE("fold + variadic templates")
 {
-    using namespace BeforeCpp17;
-
     REQUIRE(sum(1, 2, 3, 4) == 10);
+
+    print(1, 3.14, "text", "abc"s);
+
+    print_lines(1, 3.14, "text", "abc"s);
 }
