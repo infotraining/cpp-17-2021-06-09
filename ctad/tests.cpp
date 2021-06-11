@@ -49,6 +49,9 @@ TEST_CASE("Template Argument Deduction - case 1")
 template <typename T>
 void deduce2(T& arg)
 {
+    std::remove_const_t<T> backup = arg;
+    backup++;
+
     puts(__PRETTY_FUNCTION__);
 }
 
