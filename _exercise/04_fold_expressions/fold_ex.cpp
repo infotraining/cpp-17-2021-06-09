@@ -13,6 +13,11 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 // TODO
+template <typename TContainer, typename... TArgs>
+size_t matches(const TContainer& vec, const TArgs&... items)
+{
+   return (... + std::count(std::begin(vec), std::end(vec), items));
+}
 
 TEST_CASE("matches - returns how many items is stored in a container")
 {
@@ -44,7 +49,19 @@ public:
     }
 };
 
-// TODO
+
+template<typename... Ts> 
+std::vector<std::common_type_t<Ts...>> make_vector(Ts&&... args)
+{
+    std::vector<std::common_type_t<Ts...>> ret_val;
+
+    ret_val.reserve(sizeof...(args));
+
+    (..., ret_val.push_back(std::forward<Ts>(args)));
+    
+    return ret_val;
+}
+
 
 TEST_CASE("make_vector - create vector from a list of arguments")
 {
@@ -54,9 +71,11 @@ TEST_CASE("make_vector - create vector from a list of arguments")
 
     SECTION("ints")
     {
-        std::vector<int> v = make_vector(1, 2, 3);
+        int x = 10;
 
-        REQUIRE_THAT(v, Equals(vector{1, 2, 3}));
+        std::vector<int> v = make_vector(1, 2, 3, x);
+
+        REQUIRE_THAT(v, Equals(vector{1, 2, 3, 10}));
     }
 
     SECTION("unique_ptrs")
@@ -81,7 +100,22 @@ TEST_CASE("make_vector - create vector from a list of arguments")
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-// TODO
+template <typename T>
+struct Range
+{
+    T low, high;
+};
+
+template <typename T1, typename T2>
+Range(T1,T2) -> Range<std::common_type_t<T1, T2>>;
+
+template <typename T, typename... TArgs>
+bool all_within(const Range<T>& range, const TArgs&... args)
+{
+    auto in_range = [&range](const auto& value) { return value >= range.low && value <= range.high; };
+
+    return (... && in_range(args));
+}
 
 TEST_CASE("all_within - checks if all values fit in range [low, high]")
 {
